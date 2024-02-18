@@ -25,12 +25,8 @@ total_vram = 0
 lowvram_available = True
 xpu_available = False
 
-
 directml_enabled = False
 
-
-if args.cpu:
-    cpu_state = CPUState.CPU
 
 def is_intel_xpu():
     global cpu_state
