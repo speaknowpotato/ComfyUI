@@ -6,7 +6,7 @@ import math
 
 import comfy.utils
 
-
+print('load nodes post processing!!!')
 class Blend:
     def __init__(self):
         pass
