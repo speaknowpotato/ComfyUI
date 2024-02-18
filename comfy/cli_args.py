@@ -44,9 +44,6 @@ parser.add_argument("--temp-directory", type=str, default=None, help="Set the Co
 parser.add_argument("--input-directory", type=str, default=None, help="Set the ComfyUI input directory.")
 parser.add_argument("--auto-launch", action="store_true", help="Automatically launch ComfyUI in the default browser.")
 parser.add_argument("--disable-auto-launch", action="store_true", help="Disable auto launching the browser.")
-
-parser.add_argument("--dont-upcast-attention", action="store_true", help="Disable upcasting of attention. Can boost speed but increase the chances of black images.")
-
 parser.add_argument("--dont-print-server", action="store_true", help="Don't print server output.")
 parser.add_argument("--quick-test-for-ci", action="store_true", help="Quick test for CI.")
 parser.add_argument("--disable-metadata", action="store_true", help="Disable saving prompt metadata in files.")
