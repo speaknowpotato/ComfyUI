@@ -66,8 +66,8 @@ from nodes import init_custom_nodes
 import comfy.model_management
 
 
-
 def prompt_worker(q, server):
+    print('start prompt worker')
     e = execution.PromptExecutor(server)
     last_gc_collect = 0
     need_gc = False
@@ -77,7 +77,6 @@ def prompt_worker(q, server):
         timeout = 1000.0
         if need_gc:
             timeout = max(gc_collect_interval - (current_time - last_gc_collect), 0.0)
-
         queue_item = q.get(timeout=timeout)
         if queue_item is not None:
             item, item_id = queue_item
@@ -102,10 +101,6 @@ def prompt_worker(q, server):
 
         flags = q.get_flags()
         free_memory = flags.get("free_memory", False)
-
-        if flags.get("unload_models", free_memory):
-            need_gc = True
-            last_gc_collect = 0
 
         if free_memory:
             e.reset()
@@ -139,26 +134,6 @@ def cleanup_temp():
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def load_extra_path_config(yaml_path):
-    with open(yaml_path, 'r') as stream:
-        config = yaml.safe_load(stream)
-    for c in config:
-        conf = config[c]
-        if conf is None:
-            continue
-        base_path = None
-        if "base_path" in conf:
-            base_path = conf.pop("base_path")
-        for x in conf:
-            for y in conf[x].split("\n"):
-                if len(y) == 0:
-                    continue
-                full_path = y
-                if base_path is not None:
-                    full_path = os.path.join(base_path, full_path)
-                print("Adding extra search path", x, full_path)
-                folder_paths.add_model_folder_path(x, full_path)
-
 
 if __name__ == "__main__":
     if args.temp_directory:
@@ -171,14 +146,6 @@ if __name__ == "__main__":
     asyncio.set_event_loop(loop)
     server = server.PromptServer(loop)
     q = execution.PromptQueue(server)
-
-    extra_model_paths_config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "extra_model_paths.yaml")
-    if os.path.isfile(extra_model_paths_config_path):
-        load_extra_path_config(extra_model_paths_config_path)
-
-    if args.extra_model_paths_config:
-        for config_path in itertools.chain(*args.extra_model_paths_config):
-            load_extra_path_config(config_path)
 
     init_custom_nodes()
 
